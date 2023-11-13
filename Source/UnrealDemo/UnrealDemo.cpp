@@ -1,0 +1,9 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#include "UnrealDemo.h"
+#include "Modules/ModuleManager.h"
+
+IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, UnrealDemo, "UnrealDemo" );
+
+DEFINE_LOG_CATEGORY(LogUnrealDemo)
+ 
