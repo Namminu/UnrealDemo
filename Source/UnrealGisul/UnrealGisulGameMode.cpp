@@ -12,4 +12,11 @@ AUnrealGisulGameMode::AUnrealGisulGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	//// set default pawn class to our Blueprinted character
+	//static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClass(TEXT("/Script/CoreUObject.Class'/Script/UnrealGisul.CustomController'"));
+	//if (PlayerControllerClass.Class != NULL)
+	//{
+	//	DefaultPawnClass = PlayerControllerClass.Class;
+	//}
 }
