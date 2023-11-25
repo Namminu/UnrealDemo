@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class ThirdTestTarget : TargetRules
+public class UnrealGisulTarget : TargetRules
 {
-	public ThirdTestTarget(TargetInfo Target) : base(Target)
+	public UnrealGisulTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
-		ExtraModuleNames.Add("ThirdTest");
+		ExtraModuleNames.Add("UnrealGisul");
 	}
 }

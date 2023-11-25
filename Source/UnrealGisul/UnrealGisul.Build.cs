@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class ThirdTest : ModuleRules
+public class UnrealGisul : ModuleRules
 {
-	public ThirdTest(ReadOnlyTargetRules Target) : base(Target)
+	public UnrealGisul(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 

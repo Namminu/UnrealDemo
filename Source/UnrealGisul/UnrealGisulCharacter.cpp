@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "ThirdTestCharacter.h"
+#include "UnrealGisulCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -12,9 +12,9 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-// AThirdTestCharacter
+// AUnrealGisulCharacter
 
-AThirdTestCharacter::AThirdTestCharacter()
+AUnrealGisulCharacter::AUnrealGisulCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -51,7 +51,7 @@ AThirdTestCharacter::AThirdTestCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
-void AThirdTestCharacter::BeginPlay()
+void AUnrealGisulCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
@@ -69,7 +69,7 @@ void AThirdTestCharacter::BeginPlay()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void AThirdTestCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void AUnrealGisulCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
@@ -79,16 +79,16 @@ void AThirdTestCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AThirdTestCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Move);
 
 		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AThirdTestCharacter::Look);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Look);
 
 	}
 
 }
 
-void AThirdTestCharacter::Move(const FInputActionValue& Value)
+void AUnrealGisulCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -111,17 +111,17 @@ void AThirdTestCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void AThirdTestCharacter::Look(const FInputActionValue& Value)
+void AUnrealGisulCharacter::Look(const FInputActionValue& Value)
 {
-	//// input is a Vector2D
-	//FVector2D LookAxisVector = Value.Get<FVector2D>();
+	// input is a Vector2D
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	//if (Controller != nullptr)
-	//{
-	//	// add yaw and pitch input to controller
-	//	AddControllerYawInput(LookAxisVector.X);
-	//	AddControllerPitchInput(LookAxisVector.Y);
-	//}
+	if (Controller != nullptr)
+	{
+		// add yaw and pitch input to controller
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
 }
 
 

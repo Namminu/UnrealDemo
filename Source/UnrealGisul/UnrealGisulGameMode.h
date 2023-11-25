@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "ThirdTestGameMode.generated.h"
+#include "UnrealGisulGameMode.generated.h"
 
 UCLASS(minimalapi)
-class AThirdTestGameMode : public AGameModeBase
+class AUnrealGisulGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	AThirdTestGameMode();
+	AUnrealGisulGameMode();
 };
 
 

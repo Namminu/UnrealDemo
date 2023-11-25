@@ -5,7 +5,7 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "ThirdTest",
+			"Name": "UnrealGisul",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "ThirdTestCharacter.generated.h"
+#include "UnrealGisulCharacter.generated.h"
 
 
 UCLASS(config=Game)
-class AThirdTestCharacter : public ACharacter
+class AUnrealGisulCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -38,7 +38,7 @@ class AThirdTestCharacter : public ACharacter
 	class UInputAction* LookAction;
 
 public:
-	AThirdTestCharacter();
+	AUnrealGisulCharacter();
 	
 
 protected:
