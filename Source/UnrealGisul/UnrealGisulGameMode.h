@@ -14,12 +14,6 @@ class AUnrealGisulGameMode : public AGameModeBase
 
 public:
 	AUnrealGisulGameMode();
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SwitchController")
-	//TSubclassOf<APlayerController> MyDefaultController;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SwitchController")
-	//TSubclassOf<ACustomController> CustomController;
 };
 
 

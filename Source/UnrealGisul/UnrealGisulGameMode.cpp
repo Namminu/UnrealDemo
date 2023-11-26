@@ -14,9 +14,10 @@ AUnrealGisulGameMode::AUnrealGisulGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	//static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClass(TEXT("/Script/CoreUObject.Class'/Script/UnrealGisul.CustomController'"));
-	//if (PlayerControllerClass.Class != NULL)
-	//{
-	//	DefaultPawnClass = ACustomController::StaticClass();
-	//}
+	// set default controller to our Blueprinted controller
+	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(TEXT("/Game/Minwoo_Develop/MyCustomController"));
+	if (PlayerControllerBPClass.Class != NULL)
+	{
+		PlayerControllerClass = PlayerControllerBPClass.Class;
+	}
 }
