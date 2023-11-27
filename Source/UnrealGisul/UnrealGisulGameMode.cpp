@@ -8,7 +8,7 @@
 AUnrealGisulGameMode::AUnrealGisulGameMode()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/WizardSM_BP"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
@@ -17,7 +17,7 @@ AUnrealGisulGameMode::AUnrealGisulGameMode()
 	// set default controller to our Blueprinted controller
 	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(TEXT("/Game/Minwoo_Develop/MyCustomController"));
 	if (PlayerControllerBPClass.Class != NULL)
-	{
+	{ 
 		PlayerControllerClass = PlayerControllerBPClass.Class;
 	}
 }
