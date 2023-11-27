@@ -4,6 +4,7 @@
 #include "UnrealGisulCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
+
 AUnrealGisulGameMode::AUnrealGisulGameMode()
 {
 	// set default pawn class to our Blueprinted character
@@ -11,5 +12,12 @@ AUnrealGisulGameMode::AUnrealGisulGameMode()
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
+	}
+
+	// set default controller to our Blueprinted controller
+	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(TEXT("/Game/Minwoo_Develop/MyCustomController"));
+	if (PlayerControllerBPClass.Class != NULL)
+	{
+		PlayerControllerClass = PlayerControllerBPClass.Class;
 	}
 }

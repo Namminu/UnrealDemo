@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+//#include "CustomController.generated.h"
 #include "UnrealGisulGameMode.generated.h"
 
 UCLASS(minimalapi)
