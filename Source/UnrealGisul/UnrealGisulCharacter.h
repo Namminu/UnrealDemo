@@ -37,6 +37,9 @@ class AUnrealGisulCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* Weapon;
+
 public:
 	AUnrealGisulCharacter();
 	

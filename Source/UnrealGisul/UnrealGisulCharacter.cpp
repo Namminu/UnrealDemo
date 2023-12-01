@@ -49,6 +49,16 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	FName SocketName = FName(TEXT("Waepon"));
+
+		Weapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WEAPON"));
+
+		Weapon->SetHiddenInGame(false, false);
+		Weapon->SetVisibility(true, true);
+		Weapon->ShowBone(SocketName);
+	}
+
 }
 
 void AUnrealGisulCharacter::BeginPlay()
