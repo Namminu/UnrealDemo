@@ -115,15 +115,17 @@ void AUnrealGisulCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
+
 void AUnrealGisulCharacter::StartFire()
 {
 	if (!isAttack) // 발사 중이 아닐 때만 발사
 	{
-		isAttack = true;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Can Move"));
 		PlayAnimMontage(AttackMontage, 1.0f);
-		FTimerHandle FireTimerHandle;
+		
 		// 타이머를 사용하여 원하는 시간이 지난 후에 물체를 생성
 		GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AUnrealGisulCharacter::Fire, DelayTime, false);
+		isAttack = true;
 	}
 }
 
@@ -159,5 +161,6 @@ void AUnrealGisulCharacter::Fire()
 void AUnrealGisulCharacter::Fire_End()
 {
 	isAttack = false;
+	//GetWorldTimerManager().ClearTimer(FireTimerHandle);
 }
 

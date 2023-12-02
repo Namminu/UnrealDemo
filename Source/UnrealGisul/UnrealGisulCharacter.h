@@ -79,9 +79,9 @@ public:
 	void Fire();
 
 	void Fire_End();
+
 	// 카메라 위치로부터의 총구 오프셋입니다.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	FVector MuzzleOffset;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = Pawn)
 	UAnimMontage* AttackMontage;
@@ -92,8 +92,8 @@ public:
 	float DelayTime = 0.5f;
 
 private:
-	void AttackCheck();
 
+	FTimerHandle FireTimerHandle;
 
 };
 

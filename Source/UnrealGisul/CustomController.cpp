@@ -26,7 +26,6 @@ void ACustomController::LookMouseCursor()
 	{
 		APawn* const MyPawn = GetPawn();
 		if (MyPawn)
-
 		{
 			FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(MyPawn->GetActorLocation(),
 				FVector(Hit.Location.X, Hit.Location.Y, MyPawn->GetActorLocation().Z));

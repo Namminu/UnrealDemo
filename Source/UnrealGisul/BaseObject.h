@@ -24,7 +24,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "MoveAble")
 	void MoveAble();
 
-
+	FORCEINLINE bool GetisCanMove() const { return isCanMove; }
 
 protected:
 	// Called when the game starts or when spawned
