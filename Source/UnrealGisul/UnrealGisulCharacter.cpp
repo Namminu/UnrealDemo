@@ -9,7 +9,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "MagicProjectile.h"
+#include <Engine/Classes/Kismet/KismetArrayLibrary.h>
 
 //////////////////////////////////////////////////////////////////////////
 // AUnrealGisulCharacter
@@ -49,6 +50,9 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	isAttack = false;
+	
 }
 
 void AUnrealGisulCharacter::BeginPlay()
@@ -64,6 +68,7 @@ void AUnrealGisulCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -81,9 +86,8 @@ void AUnrealGisulCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Move);
 
-		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Look);
-
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::StartFire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AUnrealGisulCharacter::Fire_End);
 	}
 
 }
@@ -111,19 +115,49 @@ void AUnrealGisulCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void AUnrealGisulCharacter::Look(const FInputActionValue& Value)
+void AUnrealGisulCharacter::StartFire()
 {
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
+	if (!isAttack) // 발사 중이 아닐 때만 발사
 	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		isAttack = true;
+		PlayAnimMontage(AttackMontage, 1.0f);
+		FTimerHandle FireTimerHandle;
+		// 타이머를 사용하여 원하는 시간이 지난 후에 물체를 생성
+		GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AUnrealGisulCharacter::Fire, DelayTime, false);
 	}
 }
 
 
+void AUnrealGisulCharacter::Fire()
+{
 
+	// 발사체 발사를 시도합니다.
+	if (ProjectileClass && !isAttack)
+	{
+		
+		FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+
+		AMagicProjectile* Projectile = GetWorld()->SpawnActor<AMagicProjectile>(ProjectileClass, SpawnLocation, GetActorRotation());
+
+		if (Projectile)
+		{
+			// 발사 방향 설정 (캐릭터의 전방 벡터를 사용)
+			FVector ShootDirection = GetActorForwardVector();
+
+			// 추가적인 속성 설정 (예: 발사 속도)
+			Projectile->FireInDirection(ShootDirection);
+
+			// 프로젝타일 스폰
+			Projectile->Spawn();
+		}
+
+		/*FTimerHandle TH_Attack_End;
+		GetWorldTimerManager().SetTimer(TH_Attack_End, this, &AUnrealGisulCharacter::Fire_End, 1.7f, false);*/
+	}
+}
+
+void AUnrealGisulCharacter::Fire_End()
+{
+	isAttack = false;
+}
 
