@@ -14,7 +14,8 @@ ABaseTile::ABaseTile()
 	//StaticMesh
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
 	Body->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-
+	//Body->SetRelativeScale3D(FVector(2.0f, 2.0f, 0.1f));
+	//Body->SetStaticMesh
 	//Box Collision
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->AttachToComponent(Body, FAttachmentTransformRules::KeepRelativeTransform);
