@@ -14,13 +14,23 @@ ABaseTile::ABaseTile()
 	//StaticMesh
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
 	Body->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	//Body->SetRelativeScale3D(FVector(2.0f, 2.0f, 0.1f));
-	//Body->SetStaticMesh
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMeshAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cube"));
+	if (CubeMeshAsset.Succeeded())
+	{
+		Body->SetStaticMesh(CubeMeshAsset.Object);
+	}
+	//자체제작 메테리얼 적용
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MyMaterialAsset(TEXT("/Game/Content/Minwoo_Develop/Object/YellowMT"));
+	if (MyMaterialAsset.Succeeded())
+	{
+		Body->SetMaterial(0, MyMaterialAsset.Object);
+	}
+	Body->SetWorldScale3D(FVector(2.0f, 2.0f, 0.1f));
+
 	//Box Collision
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->AttachToComponent(Body, FAttachmentTransformRules::KeepRelativeTransform);
-	//Box Collision OverlapEvent Bind
-	CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ABaseTile::BeginOverlap);
+	CollisionBox->SetWorldScale3D(FVector(1.0f, 1.0f, 2.0f));
 
 	//Particle
 	ParticleComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleComponent"));
@@ -31,6 +41,7 @@ ABaseTile::ABaseTile()
 		ParticleComponent->SetTemplate(ParticleSystemAsset.Object);
 		//ParticleComponent->ActivateSystem();
 	}
+	ParticleComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 230.0f));
 
 	//변수 초기화
 	isTurn = false;
@@ -42,6 +53,8 @@ void ABaseTile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Box Collision OverlapEvent Bind
+	CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ABaseTile::BeginOverlap);
 }
 
 // Called every frame
@@ -58,6 +71,7 @@ void ABaseTile::EffectOnOff_Implementation()
 	{
 		ParticleComponent->SetVisibility(true);
 		ParticleComponent->SetComponentTickEnabled(true);
+
 		//delayTime 만큼 딜레이 후
 		FTimerHandle TimerHandle;
 		FTimerDelegate TimerDelegate;
@@ -75,9 +89,13 @@ void ABaseTile::EffectOnOff_Implementation()
 void ABaseTile::BeginOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	isTurn = true;
+	//태그 추가 - 플레이어 판별
+	if (OtherComp->ComponentHasTag("PLAYER"))
+	{
+		isTurn = true;
 
-	UE_LOG(LogTemp, Warning, TEXT("Overlap"));
+		UE_LOG(LogTemp, Warning, TEXT("Overlap"));
+	}
 }
 
 //딜레이 후 일어나는 이벤트
