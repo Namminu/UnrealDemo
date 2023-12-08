@@ -68,9 +68,3 @@ void ABaseOpenDoor::GetTileIsTurn()
 {
 
 }
-
-//
-void ABaseOpenDoor::DoorMoving()
-{
-
-}

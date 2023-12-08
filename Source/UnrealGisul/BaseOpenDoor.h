@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/TimelineComponent.h"
 #include "BaseOpenDoor.generated.h"
 
 UCLASS()
@@ -11,9 +12,11 @@ class UNREALGISUL_API ABaseOpenDoor : public AActor
 {
 	GENERATED_BODY()
 private:
+	//루트 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* DefaultComponent;
 
+	//스태틱 메시 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* LeftDoor;
 
@@ -33,9 +36,8 @@ public:
 	void GetTileIsTurn();
 
 	//Door가 열리기 위한 함수
-	UFUNCTION(BlueprintCallable, Category = "TileEvent") //추후 BlueprintImplementableEvent 가능성 존재
+	UFUNCTION(BlueprintImplementableEvent, Category = "TileEvent") //추후 BlueprintImplementableEvent 가능성 존재
 	void DoorMoving();
-
 
 protected:
 	// Called when the game starts or when spawned
