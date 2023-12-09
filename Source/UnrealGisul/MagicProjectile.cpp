@@ -4,7 +4,7 @@
 #include "MagicProjectile.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-
+#include "BaseObject.h"
 // Sets default values
 AMagicProjectile::AMagicProjectile()
 {
@@ -93,6 +93,6 @@ void AMagicProjectile::Spawn()
 void AMagicProjectile::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
     class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("111"));
-    Destroy();
+    //GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("OtherActor: %s"), OtherActor));
+    //Destroy();
 }

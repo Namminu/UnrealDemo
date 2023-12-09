@@ -29,6 +29,7 @@ public:
 
 	FORCEINLINE bool GetisCanMove() const { return isCanMove; }
 
+	
 protected:
 	//ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	// Called when the game starts or when spawned
