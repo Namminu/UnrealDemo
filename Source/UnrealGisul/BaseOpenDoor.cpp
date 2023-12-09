@@ -45,6 +45,10 @@ ABaseOpenDoor::ABaseOpenDoor()
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), TileObjClass, FoundActors);
 	tileCount = FoundActors.Num();
+
+	//index초기화
+	indexCount = 0;
+
 }
 
 // Called when the game starts or when spawned
@@ -52,8 +56,13 @@ void ABaseOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();	
 
+	//boolList 초기화
+	boolList.Init(false, tileCount);
+
 	// 타일 갯수 출력
 	UE_LOG(LogTemp, Warning, TEXT("Tile Obj: %d"), tileCount);
+
+	//CastFuncTileNumToVariable();
 }
 
 // Called every frame
@@ -61,10 +70,85 @@ void ABaseOpenDoor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//실시간으로 타일의 bool 변수값 확인
+	if (GetTileIsTurn())
+	{
+		DoorMoving();
+	}
 }
 
-//
-void ABaseOpenDoor::GetTileIsTurn()
+//타일들의 isTurn 값을 받아오기 위한 함수
+void ABaseOpenDoor::CastFuncTileNumToVariable(int tileNum)
 {
+	/*TSubclassOf<ABaseTile> baseTileClass = ABaseTile::StaticClass();
+	TArray<AActor*> TileArrayInLevel;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), baseTileClass, TileArrayInLevel);
 
+	for (AActor* actor : TileArrayInLevel)
+	{
+		ABaseTile* theTile = Cast<ABaseTile>(actor);
+		if (theTile)
+		{
+			if (theTile->GetmyNum() == 1)
+			{
+				tileNo1 = theTile->GetisTurn();
+				UE_LOG(LogTemp, Warning, TEXT("No1 Casting OK"));
+				UE_LOG(LogTemp, Warning, TEXT("No1 bool : %s"), tileNo1 ? TEXT("True") : TEXT("False"));
+			}
+			else if (theTile->GetmyNum() == 2)
+			{
+				tileNo2 = theTile->GetisTurn();
+				UE_LOG(LogTemp, Warning, TEXT("No2 Casting OK"));
+				UE_LOG(LogTemp, Warning, TEXT("No2 bool : %s"), tileNo2);
+			}
+			else if (theTile->GetmyNum() == 3)
+			{
+				tileNo3 = theTile->GetisTurn();
+				UE_LOG(LogTemp, Warning, TEXT("No3 Casting OK"));
+				UE_LOG(LogTemp, Warning, TEXT("No3 bool : %s"), tileNo3);
+			}
+			else if (theTile->GetmyNum() == 4)
+			{
+				tileNo4 = theTile->GetisTurn();
+				UE_LOG(LogTemp, Warning, TEXT("No4 Casting OK"));
+				UE_LOG(LogTemp, Warning, TEXT("No4 bool : %s"), tileNo4);
+			}
+		}		
+	}*/
+
+	if (tileNum == numList[indexCount])
+	{
+		boolList[indexCount++] = true;
+	}
+}
+//
+bool ABaseOpenDoor::GetTileIsTurn()
+{
+	////순서대로 bool 변수값을 확인하기 위한 다중 if문
+	//if (boolList[0] && !boolList[1] && !boolList[2] && !boolList[3])
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("No1 Check OK"));
+	//	if (boolList[1] && !boolList[2] && !boolList[3])
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("No2 Check OK"));
+	//		if (boolList[2] && !boolList[3])
+	//		{
+	//			UE_LOG(LogTemp, Warning, TEXT("No3 Check OK"));
+	//			if (boolList[3])
+	//			{
+	//				UE_LOG(LogTemp, Warning, TEXT("No4 Check OK"));
+	//				//조건 만족 시 애니메이션 함수 호출
+	//				DoorMoving();
+	//				UE_LOG(LogTemp, Warning, TEXT("Call Moving Animation"));
+	//			}
+	//		}
+	//	}
+	//}
+
+	for (int i = 0; i < boolList.Num(); i++)
+	{
+		if (boolList[i] == false) return false;
+	}
+	indexCount = 0;
+	return true;
 }

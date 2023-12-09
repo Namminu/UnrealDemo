@@ -53,6 +53,14 @@ public:
 	UFUNCTION()
 	void DelayBool();
 
+	//OpenDoor 오브젝트의 캐스팅 함수 호출 타이밍을 위한 함수
+	void CallOpenDoorCast();
+
+	//myNum을 반환하기 위한 함수
+	const int GetmyNum() { return myNum; }
+	//isTurn을 반환하기 위한 함수
+	const bool GetisTurn() { return isTurn; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

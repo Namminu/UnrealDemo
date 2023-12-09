@@ -2,8 +2,10 @@
 
 #include "BaseTile.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
 #include "TimerManager.h"
+#include "BaseOpenDoor.h"
 
 // Sets default values
 ABaseTile::ABaseTile()
@@ -42,9 +44,7 @@ ABaseTile::ABaseTile()
 		//ParticleComponent->ActivateSystem();
 	}
 	ParticleComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 230.0f));
-
-	//변수 초기화
-	isTurn = false;
+	
 	delayTime = 5.0;
 }
 
@@ -55,6 +55,9 @@ void ABaseTile::BeginPlay()
 
 	//Box Collision OverlapEvent Bind
 	CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ABaseTile::BeginOverlap);
+
+	//변수 초기화
+	isTurn = false;
 }
 
 // Called every frame
@@ -95,6 +98,8 @@ void ABaseTile::BeginOverlap_Implementation(UPrimitiveComponent* OverlappedCompo
 		isTurn = true;
 
 		UE_LOG(LogTemp, Warning, TEXT("Overlap"));
+
+		CallOpenDoorCast();
 	}
 }
 
@@ -102,4 +107,11 @@ void ABaseTile::BeginOverlap_Implementation(UPrimitiveComponent* OverlappedCompo
 void ABaseTile::DelayBool()
 {
 	isTurn = false;
+}
+
+void ABaseTile::CallOpenDoorCast()
+{
+	ABaseOpenDoor* openDoor = Cast<ABaseOpenDoor>(UGameplayStatics::GetActorOfClass(GetWorld(), ABaseOpenDoor::StaticClass()));
+
+	openDoor->CastFuncTileNumToVariable(myNum);
 }
