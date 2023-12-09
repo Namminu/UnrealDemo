@@ -60,13 +60,14 @@ AMagicProjectile::AMagicProjectile()
 
     // n초 후 발사체를 제거합니다.
     InitialLifeSpan = 1.0f;
+    
 }
 
 // Called when the game starts or when spawned
 void AMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+    CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMagicProjectile::OnOverlapBegin);
 }
 
 // Called every frame
@@ -87,4 +88,11 @@ void AMagicProjectile::Spawn()
 {
     // 3초 후 발사체를 제거합니다.
     InitialLifeSpan = 1.0f;
+}
+
+void AMagicProjectile::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
+    class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("111"));
+    Destroy();
 }

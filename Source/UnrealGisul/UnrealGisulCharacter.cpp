@@ -120,7 +120,7 @@ void AUnrealGisulCharacter::StartFire()
 {
 	if (!isAttack) // 발사 중이 아닐 때만 발사
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Can Move"));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Can Move"));
 		PlayAnimMontage(AttackMontage, 1.0f);
 		
 		// 타이머를 사용하여 원하는 시간이 지난 후에 물체를 생성

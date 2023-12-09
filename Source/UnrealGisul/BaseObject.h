@@ -10,13 +10,16 @@ UCLASS()
 class UNREALGISUL_API ABaseObject : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ABaseObject();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* Body;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	class UBoxComponent* CollisionComponent;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MoveAble")
 	bool isCanMove = false;
@@ -27,10 +30,11 @@ public:
 	FORCEINLINE bool GetisCanMove() const { return isCanMove; }
 
 protected:
+	//ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
