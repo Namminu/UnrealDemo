@@ -16,7 +16,6 @@ class UNREALGISUL_API AMoveBaseObject : public ABaseObject
 public:
 
 protected:
-	//ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

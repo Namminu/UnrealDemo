@@ -29,7 +29,8 @@ void AMoveBaseObject::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, 
 
 	if (OtherActor && OtherActor->IsA(AMagicProjectile::StaticClass()))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("222"));
+		OtherActor->Destroy();
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("222"));
 		ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 
 		if (PlayerCharacter)
