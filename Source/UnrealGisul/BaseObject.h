@@ -34,9 +34,10 @@ protected:
 	//ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	bool isMagicHit;
+	float ElapsedTime = 0.0f;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	virtual void MovingGrab(float DeltaTime) {}
 };
