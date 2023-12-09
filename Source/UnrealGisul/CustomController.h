@@ -17,4 +17,8 @@ class UNREALGISUL_API ACustomController : public APlayerController
 public:
 	ACustomController();
 
+	virtual void PlayerTick(float DeltaTime) override;
+
+	UFUNCTION()
+	void LookMouseCursor();
 };

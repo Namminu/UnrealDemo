@@ -20,4 +20,4 @@ AUnrealGisulGameMode::AUnrealGisulGameMode()
 	{ 
 		PlayerControllerClass = PlayerControllerBPClass.Class;
 	}
-}
+}	
