@@ -41,36 +41,6 @@ void ANotMoveBaseObject::OnOverlapBegin(class UPrimitiveComponent* OverlappedCom
 
 		//충돌 방향 가져오기
 		CollisionDirection = SweepResult.ImpactNormal;
-
-	//	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("222"));
-	//	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-
-	//	if (PlayerCharacter)
-	//	{
-	//		//// 플레이어의 위치 가져오기
-	//		//FVector PlayerLocation = PlayerCharacter->GetActorLocation();
-
-	//		
-
-	//		// 오브젝트의 위치를 플레이어 앞으로 이동시키기
-	//		FVector NewLocation = GetActorLocation() - (CollisionDirection * 200);
-
-	//		// 오브젝트 위치 설정
-	//		PlayerCharacter->SetActorLocation(NewLocation);
-
-
-
-
-
-	//		// 플레이어의 위치 가져오기
-	//		FVector PlayerLocation = PlayerCharacter->GetActorLocation();
-
-	//		// 오브젝트의 위치를 플레이어 앞으로 이동시키기
-	//		FVector NewLocation = PlayerLocation + (PlayerCharacter->GetActorForwardVector() * 200);
-
-	//		// 오브젝트 위치 설정
-	//		SetActorLocation(NewLocation);
-	//	}
 	}
 }
 
@@ -89,8 +59,6 @@ void ANotMoveBaseObject::MovingGrab(float DeltaTime)
 		// 이동 속도와 이동 시간 설정
 		float MoveSpeed = 80.0f;
 		float MoveDuration = FVector::Dist(StartLocation, TargetLocation) / MoveSpeed;
-
-
 
 		// 경과 시간 증가
 		ElapsedTime += DeltaTime;

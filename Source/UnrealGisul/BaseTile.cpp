@@ -100,7 +100,7 @@ void ABaseTile::BeginOverlap_Implementation(UPrimitiveComponent* OverlappedCompo
 		UE_LOG(LogTemp, Warning, TEXT("Overlap"));
 
 		CallOpenDoorCast();
-	}
+	} 
 }
 
 //딜레이 후 일어나는 이벤트
