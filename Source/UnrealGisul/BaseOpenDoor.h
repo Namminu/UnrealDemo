@@ -38,7 +38,7 @@ private:
 	TArray<int32> numList;
 	//tile_isTurn bool변수 리스트
 	TArray<bool> boolList;
-
+	//리스트의 인덱스 변수
 	int indexCount;
 
 public:	

@@ -77,7 +77,7 @@ void ABaseOpenDoor::Tick(float DeltaTime)
 	}
 }
 
-//타일들의 isTurn 값을 받아오기 위한 함수
+//타일들의 isTurn 값을 받아오기 위한 함수 - BaseTile에서 호출
 void ABaseOpenDoor::CastFuncTileNumToVariable(int tileNum)
 {
 	/*TSubclassOf<ABaseTile> baseTileClass = ABaseTile::StaticClass();
@@ -116,12 +116,15 @@ void ABaseOpenDoor::CastFuncTileNumToVariable(int tileNum)
 		}		
 	}*/
 
+	//매개변수로 넘어오는 myNum 값과 리스트의 인덱스값을 비교
 	if (tileNum == numList[indexCount])
 	{
+		//일치할 경우 OpenDoor 오브젝트의 bool 리스트 true 로 전환
 		boolList[indexCount++] = true;
 	}
 }
-//
+
+//모든 bool 리스트의 값 확인 - 전부 true 이면 true 반환
 bool ABaseOpenDoor::GetTileIsTurn()
 {
 	////순서대로 bool 변수값을 확인하기 위한 다중 if문
@@ -145,6 +148,7 @@ bool ABaseOpenDoor::GetTileIsTurn()
 	//	}
 	//}
 
+	//
 	for (int i = 0; i < boolList.Num(); i++)
 	{
 		if (boolList[i] == false) return false;
