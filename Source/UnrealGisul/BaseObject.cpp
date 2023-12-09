@@ -11,16 +11,14 @@ ABaseObject::ABaseObject()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
-	//Body->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	if (!CollisionComponent)
 	{
-		// 박스를 단순 콜리전 표현으로 사용합니다.
+		// 박스를 단순 콜리전 표현
 		CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
-		// 박스의 콜리전 반경을 설정합니다.
+		// 박스의 콜리전 반경을 설정
 		CollisionComponent->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
-		// 루트 컴포넌트가 콜리전 컴포넌트가 되도록 설정합니다.
+		// 루트 컴포넌트가 콜리전 컴포넌트가 되도록 설정
 		RootComponent = CollisionComponent;
 	}
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMeshComponent"));
