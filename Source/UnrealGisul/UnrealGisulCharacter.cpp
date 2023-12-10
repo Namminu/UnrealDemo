@@ -26,6 +26,7 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
+
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
@@ -68,6 +69,18 @@ void AUnrealGisulCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+	CharacterMovement = GetCharacterMovement();
+	// 처음 트렌스폼을 배열의 모든값에 적용
+	CharacterTransforms.Init(GetActorTransform(), TransformsSize);
+	GetWorldTimerManager().SetTimer(SaveTimerHandle, this, &AUnrealGisulCharacter::SaveCoordinates, CoolTime / TransformsSize, true);
+}
+
+void AUnrealGisulCharacter::Tick(float DeltaTime)
+{
+	if (isGoingBack)
+	{
+		AUnrealGisulCharacter::GoingBack(DeltaTime);
+	}
 	
 }
 
@@ -76,20 +89,24 @@ void AUnrealGisulCharacter::BeginPlay()
 
 void AUnrealGisulCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+	if (!isGoingBack)
+	{
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+			//Jumping
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Move);
+			//Moving
+			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Move);
 
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::StartFire);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AUnrealGisulCharacter::Fire_End);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::StartFire);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AUnrealGisulCharacter::Fire_End);
+
+			EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::TimeReversal);
+
 	}
-
+	}
 }
 
 void AUnrealGisulCharacter::Move(const FInputActionValue& Value)
@@ -126,6 +143,7 @@ void AUnrealGisulCharacter::StartFire()
 		// 타이머를 사용하여 원하는 시간이 지난 후에 물체를 생성
 		GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AUnrealGisulCharacter::Fire, DelayTime, false);
 		isAttack = true;
+
 	}
 }
 
@@ -164,3 +182,67 @@ void AUnrealGisulCharacter::Fire_End()
 	//GetWorldTimerManager().ClearTimer(FireTimerHandle);
 }
 
+void AUnrealGisulCharacter::TimeReversal()
+{
+	if (!isShift)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Shift"));
+		isShift = true;
+		isGoingBack = true;
+
+		// 중력 끔
+		CharacterMovement->SetMovementMode(MOVE_Flying);
+		GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
+		//SetActorLocation(CharacterTransforms[0].GetLocation());
+		GetWorldTimerManager().SetTimer(CoolTimerHandle, this, &AUnrealGisulCharacter::CoolTimeIsBack, CoolTime, false);
+	}
+}
+
+void AUnrealGisulCharacter::CoolTimeIsBack()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("CoolTimeEnd"));
+	isShift = false;
+}
+
+void AUnrealGisulCharacter::SaveCoordinates()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, TEXT("123123"));
+	for (int i = 0; i < TransformsSize - 1; i++)
+	{
+		CharacterTransforms[i] = CharacterTransforms[i + 1];
+	}
+	CharacterTransforms.Insert(GetActorTransform(), TransformsSize - 1);
+}
+void AUnrealGisulCharacter::GoingBack(float DeltaTime)
+{
+
+	// 이동 시작 위치와 목표 위치 설정
+	FVector StartLocation = GetActorLocation();
+	FVector TargetLocation = CharacterTransforms[0].GetLocation();
+
+	// 이동 속도와 이동 시간 설정
+	float MoveSpeed = 50.0f;
+	float MoveDuration = FVector::Dist(StartLocation, TargetLocation) / MoveSpeed;
+
+
+
+	// 경과 시간 증가
+	ElapsedTime += DeltaTime;
+
+	// 시간에 따른 보간 계산
+	float Alpha = FMath::Clamp(ElapsedTime / MoveDuration, 0.0f, 1.0f);
+	FVector NewLocation = FMath::Lerp(StartLocation, TargetLocation, Alpha);
+
+	// 오브젝트 위치 업데이트
+	SetActorLocation(NewLocation);
+
+	// 이동이 완료되면 이동 중지
+	if (ElapsedTime >= MoveDuration)
+	{
+		isGoingBack = false;
+		ElapsedTime = 0;
+		// 중력 킴
+		CharacterMovement->SetMovementMode(MOVE_Walking);
+		GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
+	}
+}

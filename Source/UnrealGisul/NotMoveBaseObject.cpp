@@ -74,6 +74,7 @@ void ANotMoveBaseObject::MovingGrab(float DeltaTime)
 		if (ElapsedTime >= MoveDuration)
 		{
 			isMagicHit = false;
+			ElapsedTime = 0;
 		}
 	}
 }

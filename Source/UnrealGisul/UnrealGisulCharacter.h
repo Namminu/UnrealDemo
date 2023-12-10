@@ -40,6 +40,9 @@ class AUnrealGisulCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* FireAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ShiftAction;
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Weapon;
 
@@ -52,15 +55,14 @@ protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
-			
-
-protected:
+		
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// To add mapping context
 	virtual void BeginPlay();
 
+	virtual void Tick(float DeltaTime) override;
 	// 스폰할 발사체 클래스입니다.
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AMagicProjectile> ProjectileClass;
@@ -80,6 +82,13 @@ public:
 
 	void Fire_End();
 
+	void TimeReversal();
+
+	void SaveCoordinates();
+
+	void CoolTimeIsBack();
+
+	void GoingBack(float DeltaTime);
 	// 카메라 위치로부터의 총구 오프셋입니다.
 
 
@@ -91,9 +100,23 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Time)
 	float DelayTime = 0.5f;
 
+
 private:
 
 	FTimerHandle FireTimerHandle;
 
+
+	TArray<FTransform> CharacterTransforms;
+
+	FTimerHandle SaveTimerHandle;
+	FTimerHandle CoolTimerHandle;
+	float CoolTime = 3;
+	float TransformsSize = 120;
+
+	bool isShift = false;
+	bool isGoingBack = false;
+	float ElapsedTime = 0.0f;
+
+	UCharacterMovementComponent* CharacterMovement;
 };
 

@@ -24,6 +24,7 @@ ABaseObject::ABaseObject()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMeshComponent"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>Mesh(TEXT("/Script/Engine.StaticMesh'/Game/StarterContent/Shapes/Shape_Cube.Shape_Cube'"));
 	if (Mesh.Succeeded())
+
 	{
 		Body->SetStaticMesh(Mesh.Object);
 	}
