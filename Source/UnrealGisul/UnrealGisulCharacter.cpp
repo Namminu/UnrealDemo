@@ -89,8 +89,6 @@ void AUnrealGisulCharacter::Tick(float DeltaTime)
 
 void AUnrealGisulCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	if (!isGoingBack)
-	{
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 			//Jumping
@@ -105,7 +103,6 @@ void AUnrealGisulCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 			EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::TimeReversal);
 
-	}
 	}
 }
 
@@ -150,9 +147,8 @@ void AUnrealGisulCharacter::StartFire()
 
 void AUnrealGisulCharacter::Fire()
 {
-
 	// 발사체 발사를 시도합니다.
-	if (ProjectileClass && !isAttack)
+	if (ProjectileClass && !isAttack && !isGoingBack)
 	{
 		
 		FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
