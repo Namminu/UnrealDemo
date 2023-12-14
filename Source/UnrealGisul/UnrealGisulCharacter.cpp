@@ -11,12 +11,15 @@
 #include "EnhancedInputSubsystems.h"
 #include "MagicProjectile.h"
 #include <Engine/Classes/Kismet/KismetArrayLibrary.h>
+#include "Components/ArrowComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AUnrealGisulCharacter
 
 AUnrealGisulCharacter::AUnrealGisulCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
@@ -48,6 +51,14 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+	TimeArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("TimeArrow"));
+	TimeArrow->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	TimeArrow->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	//새 ArrowComponent의 위치는 시간역행으로 돌아가는 위치를 표시하도록 설정 : 초기에는 캐릭터의 바로 뒤의 위치로 초기화
+	TimeArrow->SetRelativeLocation(FVector(-70.0f, 0.0f, 0.0f));
+	TimeArrow->SetHiddenInGame(false);
+
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -81,7 +92,8 @@ void AUnrealGisulCharacter::Tick(float DeltaTime)
 	{
 		AUnrealGisulCharacter::GoingBack(DeltaTime);
 	}
-	
+	//매 프레임마다 캐릭터가 시간역행으로 돌아가는 위치 확인
+	TimeArrow->SetRelativeLocation(CharacterTransforms[0].GetLocation());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -185,7 +197,6 @@ void AUnrealGisulCharacter::TimeReversal()
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Shift"));
 		isShift = true;
 		isGoingBack = true;
-
 		// 중력 끔
 		CharacterMovement->SetMovementMode(MOVE_Flying);
 		GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
@@ -211,16 +222,13 @@ void AUnrealGisulCharacter::SaveCoordinates()
 }
 void AUnrealGisulCharacter::GoingBack(float DeltaTime)
 {
-
 	// 이동 시작 위치와 목표 위치 설정
-	FVector StartLocation = GetActorLocation();
-	FVector TargetLocation = CharacterTransforms[0].GetLocation();
+	StartLocation = GetActorLocation();
+	TargetLocation = CharacterTransforms[0].GetLocation();
 
 	// 이동 속도와 이동 시간 설정
 	float MoveSpeed = 50.0f;
 	float MoveDuration = FVector::Dist(StartLocation, TargetLocation) / MoveSpeed;
-
-
 
 	// 경과 시간 증가
 	ElapsedTime += DeltaTime;

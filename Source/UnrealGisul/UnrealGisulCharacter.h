@@ -46,6 +46,12 @@ class AUnrealGisulCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Weapon;
 
+	UPROPERTY(BluePrintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	UArrowComponent* TimeArrow;
+
+	FVector StartLocation;
+	FVector TargetLocation;
+
 public:
 	AUnrealGisulCharacter();
 	
