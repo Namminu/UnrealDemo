@@ -44,8 +44,5 @@ public:
 	UMaterialInstanceDynamic* ProjectileMaterialInstance;
 
 	// 발사 속도 설정
-
-
-
 	void Spawn();
 };
