@@ -44,7 +44,7 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	// Create a camera boom (pulls in towards the player if there is a collision) 
+	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
@@ -59,24 +59,27 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 
 	//Niagara Component
 	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiaragaComponent"));
-	NiagaraComponent->AttachToComponent(ACharacter::GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
-	NiagaraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f)); 
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSystemAsset(TEXT("/Game/KTP_Effect/Particles/Bottom/Bottom08-05"));
+	NiagaraComponent->SetupAttachment(ACharacter::GetMesh());
+	NiagaraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem>NiagaraSystemAsset(TEXT("/Game/KTP_Effect/Particles/Bottom/Bottom08-05"));
 	if (NiagaraSystemAsset.Succeeded())
 	{
 		NiagaraComponent->SetAsset(NiagaraSystemAsset.Object);
-
 	}
+
 	//HpBarWidget Component
 	HpBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HpBarWZ"));
 	//HpBarWidgetComponent->SetWidget(PlayerHPWidget);
+
+	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
+	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
 	isAttack = false;
 	
 }
 
 void AUnrealGisulCharacter::BeginPlay()
-{
+{	
 	// Call the base class  
 	Super::BeginPlay();
 
@@ -89,19 +92,28 @@ void AUnrealGisulCharacter::BeginPlay()
 		}
 	}
 	CharacterMovement = GetCharacterMovement();
+
 	// 처음 트렌스폼을 배열의 모든값에 적용
 	CharacterTransforms.Init(GetActorTransform(), TransformsSize);
+	HPList.Init(player_Hp, TransformsSize);
 	GetWorldTimerManager().SetTimer(SaveTimerHandle, this, &AUnrealGisulCharacter::SaveCoordinates, CoolTime / TransformsSize, true);
 
 	NiagaraComponent->Deactivate();    //처음 플레이 시에는 비활성화 한 상태로 시작
+
+	SpawnArrow = GetWorld()->SpawnActor<AActor>(Arrow, GetActorLocation(), GetActorRotation());
+
 }
 
 void AUnrealGisulCharacter::Tick(float DeltaTime)
 {
+	GEngine->AddOnScreenDebugMessage(-1, DeltaTime, FColor::Red, FString::Printf(TEXT("Player Hp : %d"), player_Hp));
+
 	if (isGoingBack)
 	{
 		AUnrealGisulCharacter::GoingBack(DeltaTime);
 	}
+	//매 프레임마다 캐릭터가 시간역행으로 돌아가는 위치 확인
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -111,19 +123,20 @@ void AUnrealGisulCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 {
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+			//Jumping
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Move);
+			//Moving
+			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Move);
 
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::StartFire);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AUnrealGisulCharacter::Fire_End);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::StartFire);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AUnrealGisulCharacter::Fire_End);
 
-		EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::TimeReversal);
+			EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::TimeReversal);
 
-		EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Started, this, &AUnrealGisulCharacter::debug_MinusHP);
+			EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Started, this, &AUnrealGisulCharacter::debug_MinusHP);
+
 	}
 }
 
@@ -203,7 +216,7 @@ void AUnrealGisulCharacter::TimeReversal()
 {
 	if (!isShift)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Shift"));
+		
 		isShift = true;
 		isGoingBack = true;
 		// 중력 끔
@@ -211,6 +224,7 @@ void AUnrealGisulCharacter::TimeReversal()
 		GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
 		//SetActorLocation(CharacterTransforms[0].GetLocation());
 		GetWorldTimerManager().SetTimer(CoolTimerHandle, this, &AUnrealGisulCharacter::CoolTimeIsBack, CoolTime, false);
+		SpawnArrow->SetActorHiddenInGame(true);
 		EffectFunc();
 	}
 }
@@ -218,6 +232,7 @@ void AUnrealGisulCharacter::TimeReversal()
 void AUnrealGisulCharacter::CoolTimeIsBack()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("CoolTimeEnd"));
+	SpawnArrow->SetActorHiddenInGame(false);
 	isShift = false;
 }
 
@@ -227,8 +242,14 @@ void AUnrealGisulCharacter::SaveCoordinates()
 	for (int i = 0; i < TransformsSize - 1; i++)
 	{
 		CharacterTransforms[i] = CharacterTransforms[i + 1];
+		HPList[i] = HPList[i + 1];
 	}
 	CharacterTransforms.Insert(GetActorTransform(), TransformsSize - 1);
+	HPList.Insert(player_Hp, TransformsSize - 1);
+	SpawnArrow->SetActorLocation(CharacterTransforms[0].GetLocation());
+
+	
+
 }
 
 void AUnrealGisulCharacter::GoingBack(float DeltaTime)
@@ -254,13 +275,17 @@ void AUnrealGisulCharacter::GoingBack(float DeltaTime)
 	// 이동이 완료되면 이동 중지
 	if (ElapsedTime >= MoveDuration)
 	{
+		// 플레이어 체력 되돌리기
+		player_Hp = HPList[0];
+
 		isGoingBack = false;
 		ElapsedTime = 0;
 		// 중력 킴
 		CharacterMovement->SetMovementMode(MOVE_Walking);
 		GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
-	
 	}
+
+
 }
 
 //나이아가라 이펙트 활성화 함수
@@ -269,8 +294,6 @@ void AUnrealGisulCharacter::EffectFunc()
 	if (NiagaraComponent)
 	{
 		NiagaraComponent->Activate();
-		NiagaraComponent->SetRelativeLocation(FVector(0, 0, 0));
-		UE_LOG(LogTemp, Warning, TEXT("Effect On"));
 	}
 }
 

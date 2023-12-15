@@ -53,7 +53,7 @@ class AUnrealGisulCharacter : public ACharacter
 	UStaticMeshComponent* Weapon;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player", meta = (AllowPrivateAccess = "true"))
-	int player_Hp;
+	int32 player_Hp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TimeEffect", meta = (AllowPrivateAccess = "true"))
 	UNiagaraComponent* NiagaraComponent;
@@ -85,6 +85,9 @@ protected:
 	// 스폰할 발사체 클래스입니다.
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AMagicProjectile> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = Arrow)
+	TSubclassOf<class AActor> Arrow;
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -129,15 +132,18 @@ private:
 	void EffectFunc();
 
 	TArray<FTransform> CharacterTransforms;
+	TArray<int> HPList;
 
 	FTimerHandle SaveTimerHandle;
 	FTimerHandle CoolTimerHandle;
-	float CoolTime = 3;
-	float TransformsSize = 120;
+	float CoolTime = 6;
+	float TransformsSize = 240;
 
 	bool isShift = false;
 	bool isGoingBack = false;
 	float ElapsedTime = 0.0f;
+
+	AActor* SpawnArrow;
 
 	UCharacterMovementComponent* CharacterMovement;
 };
