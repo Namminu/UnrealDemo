@@ -92,6 +92,7 @@ void ABaseTile::EffectOnOff_Implementation()
 void ABaseTile::BeginOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("over"));
 	//태그 추가 - 플레이어 판별
 	if (OtherComp->ComponentHasTag("PLAYER"))
 	{

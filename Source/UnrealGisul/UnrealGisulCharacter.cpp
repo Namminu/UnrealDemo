@@ -44,7 +44,7 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	// Create a camera boom (pulls in towards the player if there is a collision)
+	// Create a camera boom (pulls in towards the player if there is a collision) 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
@@ -59,20 +59,17 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 
 	//Niagara Component
 	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiaragaComponent"));
-	NiagaraComponent->SetupAttachment(ACharacter::GetMesh());
-	NiagaraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	static ConstructorHelpers::FObjectFinder<UNiagaraComponent>NiagaraSystemAsset(TEXT("/Game/KTP_Effect/Particles/Bottom/Bottom08-05"));
+	NiagaraComponent->AttachToComponent(ACharacter::GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
+	NiagaraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f)); 
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSystemAsset(TEXT("/Game/KTP_Effect/Particles/Bottom/Bottom08-05"));
 	if (NiagaraSystemAsset.Succeeded())
 	{
-		/*NiagaraComponent->SetAsset(NiagaraSystemAsset.Object);*/
-	}
+		NiagaraComponent->SetAsset(NiagaraSystemAsset.Object);
 
+	}
 	//HpBarWidget Component
 	HpBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HpBarWZ"));
 	//HpBarWidgetComponent->SetWidget(PlayerHPWidget);
-
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
 	isAttack = false;
 	
@@ -105,8 +102,6 @@ void AUnrealGisulCharacter::Tick(float DeltaTime)
 	{
 		AUnrealGisulCharacter::GoingBack(DeltaTime);
 	}
-	//매 프레임마다 캐릭터가 시간역행으로 돌아가는 위치 확인
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -116,20 +111,19 @@ void AUnrealGisulCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 {
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-			//Jumping
-			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		//Jumping
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-			//Moving
-			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Move);
+		//Moving
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::Move);
 
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::StartFire);
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AUnrealGisulCharacter::Fire_End);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::StartFire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AUnrealGisulCharacter::Fire_End);
 
-			EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::TimeReversal);
+		EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::TimeReversal);
 
-			EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::debug_MinusHP);
-
+		EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Started, this, &AUnrealGisulCharacter::debug_MinusHP);
 	}
 }
 
@@ -236,6 +230,7 @@ void AUnrealGisulCharacter::SaveCoordinates()
 	}
 	CharacterTransforms.Insert(GetActorTransform(), TransformsSize - 1);
 }
+
 void AUnrealGisulCharacter::GoingBack(float DeltaTime)
 {
 	// 이동 시작 위치와 목표 위치 설정
@@ -264,6 +259,7 @@ void AUnrealGisulCharacter::GoingBack(float DeltaTime)
 		// 중력 킴
 		CharacterMovement->SetMovementMode(MOVE_Walking);
 		GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
+	
 	}
 }
 
@@ -273,6 +269,8 @@ void AUnrealGisulCharacter::EffectFunc()
 	if (NiagaraComponent)
 	{
 		NiagaraComponent->Activate();
+		NiagaraComponent->SetRelativeLocation(FVector(0, 0, 0));
+		UE_LOG(LogTemp, Warning, TEXT("Effect On"));
 	}
 }
 
