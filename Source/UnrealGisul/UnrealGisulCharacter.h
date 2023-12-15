@@ -53,7 +53,7 @@ class AUnrealGisulCharacter : public ACharacter
 	UStaticMeshComponent* Weapon;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player", meta = (AllowPrivateAccess = "true"))
-	int player_Hp;
+	int32 player_Hp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TimeEffect", meta = (AllowPrivateAccess = "true"))
 	UNiagaraComponent* NiagaraComponent;

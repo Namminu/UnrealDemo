@@ -106,6 +106,8 @@ void AUnrealGisulCharacter::BeginPlay()
 
 void AUnrealGisulCharacter::Tick(float DeltaTime)
 {
+	GEngine->AddOnScreenDebugMessage(-1, DeltaTime, FColor::Red, FString::Printf(TEXT("Player Hp : %d"), player_Hp));
+
 	if (isGoingBack)
 	{
 		AUnrealGisulCharacter::GoingBack(DeltaTime);
@@ -133,7 +135,7 @@ void AUnrealGisulCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 			EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::TimeReversal);
 
-			EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::debug_MinusHP);
+			EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Started, this, &AUnrealGisulCharacter::debug_MinusHP);
 
 	}
 }
@@ -214,7 +216,7 @@ void AUnrealGisulCharacter::TimeReversal()
 {
 	if (!isShift)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Shift"));
+		
 		isShift = true;
 		isGoingBack = true;
 		// 중력 끔
@@ -240,8 +242,10 @@ void AUnrealGisulCharacter::SaveCoordinates()
 	for (int i = 0; i < TransformsSize - 1; i++)
 	{
 		CharacterTransforms[i] = CharacterTransforms[i + 1];
+		HPList[i] = HPList[i + 1];
 	}
 	CharacterTransforms.Insert(GetActorTransform(), TransformsSize - 1);
+	HPList.Insert(player_Hp, TransformsSize - 1);
 	SpawnArrow->SetActorLocation(CharacterTransforms[0].GetLocation());
 
 	
@@ -271,12 +275,17 @@ void AUnrealGisulCharacter::GoingBack(float DeltaTime)
 	// 이동이 완료되면 이동 중지
 	if (ElapsedTime >= MoveDuration)
 	{
+		// 플레이어 체력 되돌리기
+		player_Hp = HPList[0];
+
 		isGoingBack = false;
 		ElapsedTime = 0;
 		// 중력 킴
 		CharacterMovement->SetMovementMode(MOVE_Walking);
 		GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
 	}
+
+
 }
 
 //나이아가라 이펙트 활성화 함수
