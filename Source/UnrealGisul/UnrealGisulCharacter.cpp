@@ -69,13 +69,18 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 
 	//HpBarWidget Component
 	HpBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HpBarWZ"));
-	//HpBarWidgetComponent->SetWidget(PlayerHPWidget);
+	HpBarWidgetComponent->SetupAttachment(ACharacter::GetCapsuleComponent());
+	HpBarWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	static ConstructorHelpers::FObjectFinder<UUserWidget>PlayerWidgetComponent(TEXT("/Game/Minwoo_Develop/WZ_PlayerHp"));
+	if (PlayerWidgetComponent.Succeeded())
+	{
+		HpBarWidgetComponent->SetWidgetClass(PlayerWidgetComponent.Object->GetClass());
+	}
+	HpBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 130.0f));
+	HpBarWidgetComponent->SetRelativeRotation(FRotator(0.0f, 180.0f, 0.0f));
+	HpBarWidgetComponent->SetRelativeScale3D(FVector(1.0f, 0.3f, 0.2f));
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
-
-	isAttack = false;
-	
+	isAttack = false;	
 }
 
 void AUnrealGisulCharacter::BeginPlay()
@@ -101,7 +106,6 @@ void AUnrealGisulCharacter::BeginPlay()
 	NiagaraComponent->Deactivate();    //처음 플레이 시에는 비활성화 한 상태로 시작
 
 	SpawnArrow = GetWorld()->SpawnActor<AActor>(Arrow, GetActorLocation(), GetActorRotation());
-
 }
 
 void AUnrealGisulCharacter::Tick(float DeltaTime)
@@ -247,9 +251,6 @@ void AUnrealGisulCharacter::SaveCoordinates()
 	CharacterTransforms.Insert(GetActorTransform(), TransformsSize - 1);
 	HPList.Insert(player_Hp, TransformsSize - 1);
 	SpawnArrow->SetActorLocation(CharacterTransforms[0].GetLocation());
-
-	
-
 }
 
 void AUnrealGisulCharacter::GoingBack(float DeltaTime)
