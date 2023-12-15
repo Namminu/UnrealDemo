@@ -12,7 +12,10 @@
 #include "MagicProjectile.h"
 #include <Engine/Classes/Kismet/KismetArrayLibrary.h>
 #include "Components/ArrowComponent.h"
-
+#include <Kismet/GameplayStatics.h>
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "Components/WidgetComponent.h"
 //////////////////////////////////////////////////////////////////////////
 // AUnrealGisulCharacter
 
@@ -52,13 +55,21 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	TimeArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("TimeArrow"));
-	TimeArrow->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	TimeArrow->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	//새 ArrowComponent의 위치는 시간역행으로 돌아가는 위치를 표시하도록 설정 : 초기에는 캐릭터의 바로 뒤의 위치로 초기화
-	TimeArrow->SetRelativeLocation(FVector(-70.0f, 0.0f, 0.0f));
-	TimeArrow->SetHiddenInGame(false);
+	player_Hp = 100;
 
+	//Niagara Component
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiaragaComponent"));
+	NiagaraComponent->SetupAttachment(ACharacter::GetMesh());
+	NiagaraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	static ConstructorHelpers::FObjectFinder<UNiagaraComponent>NiagaraSystemAsset(TEXT("/Game/KTP_Effect/Particles/Bottom/Bottom08-05"));
+	if (NiagaraSystemAsset.Succeeded())
+	{
+		/*NiagaraComponent->SetAsset(NiagaraSystemAsset.Object);*/
+	}
+
+	//HpBarWidget Component
+	HpBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HpBarWZ"));
+	//HpBarWidgetComponent->SetWidget(PlayerHPWidget);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -84,6 +95,8 @@ void AUnrealGisulCharacter::BeginPlay()
 	// 처음 트렌스폼을 배열의 모든값에 적용
 	CharacterTransforms.Init(GetActorTransform(), TransformsSize);
 	GetWorldTimerManager().SetTimer(SaveTimerHandle, this, &AUnrealGisulCharacter::SaveCoordinates, CoolTime / TransformsSize, true);
+
+	NiagaraComponent->Deactivate();    //처음 플레이 시에는 비활성화 한 상태로 시작
 }
 
 void AUnrealGisulCharacter::Tick(float DeltaTime)
@@ -93,7 +106,7 @@ void AUnrealGisulCharacter::Tick(float DeltaTime)
 		AUnrealGisulCharacter::GoingBack(DeltaTime);
 	}
 	//매 프레임마다 캐릭터가 시간역행으로 돌아가는 위치 확인
-	TimeArrow->SetRelativeLocation(CharacterTransforms[0].GetLocation());
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -114,6 +127,8 @@ void AUnrealGisulCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AUnrealGisulCharacter::Fire_End);
 
 			EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::TimeReversal);
+
+			EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Triggered, this, &AUnrealGisulCharacter::debug_MinusHP);
 
 	}
 }
@@ -202,6 +217,7 @@ void AUnrealGisulCharacter::TimeReversal()
 		GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
 		//SetActorLocation(CharacterTransforms[0].GetLocation());
 		GetWorldTimerManager().SetTimer(CoolTimerHandle, this, &AUnrealGisulCharacter::CoolTimeIsBack, CoolTime, false);
+		EffectFunc();
 	}
 }
 
@@ -249,4 +265,20 @@ void AUnrealGisulCharacter::GoingBack(float DeltaTime)
 		CharacterMovement->SetMovementMode(MOVE_Walking);
 		GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
 	}
+}
+
+//나이아가라 이펙트 활성화 함수
+void AUnrealGisulCharacter::EffectFunc()
+{
+	if (NiagaraComponent)
+	{
+		NiagaraComponent->Activate();
+	}
+}
+
+//디버깅용 체력 깎는 함수
+void AUnrealGisulCharacter::debug_MinusHP()
+{
+	player_Hp -= 10;
+	UE_LOG(LogTemp, Warning, TEXT("Player Hp : %d"), player_Hp);
 }

@@ -8,6 +8,9 @@
 #include "UnrealGisulCharacter.generated.h"
 
 
+class UNiagaraComponent;
+class UWidgetComponent;
+
 UCLASS(config=Game)
 class AUnrealGisulCharacter : public ACharacter
 {
@@ -43,14 +46,24 @@ class AUnrealGisulCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ShiftAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* DebugAction;
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Weapon;
 
-	UPROPERTY(BluePrintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	UArrowComponent* TimeArrow;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	int player_Hp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TimeEffect", meta = (AllowPrivateAccess = "true"))
+	UNiagaraComponent* NiagaraComponent;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* HpBarWidgetComponent;
 
 	FVector StartLocation;
 	FVector TargetLocation;
+
 
 public:
 	AUnrealGisulCharacter();
@@ -106,11 +119,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Time)
 	float DelayTime = 0.5f;
 
+	UFUNCTION(BluePrintCallable, Category = "Player")
+	void debug_MinusHP();
 
 private:
 
 	FTimerHandle FireTimerHandle;
 
+	void EffectFunc();
 
 	TArray<FTransform> CharacterTransforms;
 
