@@ -61,10 +61,10 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiaragaComponent"));
 	NiagaraComponent->SetupAttachment(ACharacter::GetMesh());
 	NiagaraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	static ConstructorHelpers::FObjectFinder<UNiagaraComponent>NiagaraSystemAsset(TEXT("/Game/KTP_Effect/Particles/Bottom/Bottom08-05"));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem>NiagaraSystemAsset(TEXT("/Game/KTP_Effect/Particles/Bottom/Bottom08-05"));
 	if (NiagaraSystemAsset.Succeeded())
 	{
-		/*NiagaraComponent->SetAsset(NiagaraSystemAsset.Object);*/
+		NiagaraComponent->SetAsset(NiagaraSystemAsset.Object);
 	}
 
 	//HpBarWidget Component
@@ -79,7 +79,7 @@ AUnrealGisulCharacter::AUnrealGisulCharacter()
 }
 
 void AUnrealGisulCharacter::BeginPlay()
-{
+{	
 	// Call the base class  
 	Super::BeginPlay();
 
@@ -92,11 +92,16 @@ void AUnrealGisulCharacter::BeginPlay()
 		}
 	}
 	CharacterMovement = GetCharacterMovement();
+
 	// 처음 트렌스폼을 배열의 모든값에 적용
 	CharacterTransforms.Init(GetActorTransform(), TransformsSize);
+	HPList.Init(player_Hp, TransformsSize);
 	GetWorldTimerManager().SetTimer(SaveTimerHandle, this, &AUnrealGisulCharacter::SaveCoordinates, CoolTime / TransformsSize, true);
 
 	NiagaraComponent->Deactivate();    //처음 플레이 시에는 비활성화 한 상태로 시작
+
+	SpawnArrow = GetWorld()->SpawnActor<AActor>(Arrow, GetActorLocation(), GetActorRotation());
+
 }
 
 void AUnrealGisulCharacter::Tick(float DeltaTime)
@@ -217,6 +222,7 @@ void AUnrealGisulCharacter::TimeReversal()
 		GetCapsuleComponent()->SetCollisionProfileName(FName("NoCollision"));
 		//SetActorLocation(CharacterTransforms[0].GetLocation());
 		GetWorldTimerManager().SetTimer(CoolTimerHandle, this, &AUnrealGisulCharacter::CoolTimeIsBack, CoolTime, false);
+		SpawnArrow->SetActorHiddenInGame(true);
 		EffectFunc();
 	}
 }
@@ -224,6 +230,7 @@ void AUnrealGisulCharacter::TimeReversal()
 void AUnrealGisulCharacter::CoolTimeIsBack()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("CoolTimeEnd"));
+	SpawnArrow->SetActorHiddenInGame(false);
 	isShift = false;
 }
 
@@ -235,7 +242,12 @@ void AUnrealGisulCharacter::SaveCoordinates()
 		CharacterTransforms[i] = CharacterTransforms[i + 1];
 	}
 	CharacterTransforms.Insert(GetActorTransform(), TransformsSize - 1);
+	SpawnArrow->SetActorLocation(CharacterTransforms[0].GetLocation());
+
+	
+
 }
+
 void AUnrealGisulCharacter::GoingBack(float DeltaTime)
 {
 	// 이동 시작 위치와 목표 위치 설정
